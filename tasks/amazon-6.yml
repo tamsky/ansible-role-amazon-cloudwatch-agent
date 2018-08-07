@@ -6,8 +6,6 @@
   register: probably_already_installed
 
 - block:
-  when: probably_already_installed.stat.exists != True
-  ignore_errors: "{{ ansible_check_mode }}"
   - name: make temp dir for installation files
     file:
       path: /tmp/aws-cwa-inst
@@ -26,6 +24,8 @@
     file:
       path: /tmp/aws-cwa-inst/
       state: absent
+  when: ( probably_already_installed.stat.exists != True )
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy configs amazon-cloudwatch-agent.(json|toml)
   template:
