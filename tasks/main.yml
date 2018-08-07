@@ -25,14 +25,14 @@
     (ansible_architecture != 'x86_64')
       or
     (
-      (ansible_distribution|lower != 'ubuntu')
-        or
+      (ansible_distribution|lower == 'ubuntu')
+        and
       (ansible_distribution_major_version not in ['12','14','16'])
     )
       or
     (
-      (ansible_distribution|lower != 'amazon')
-        or
+      (ansible_distribution|lower == 'amazon')
+        and
       (ansible_distribution_major_version not in ['6'])
     )
 
