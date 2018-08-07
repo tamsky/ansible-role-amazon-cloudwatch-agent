@@ -14,19 +14,18 @@
 {% for logfile in aws_cwa_logfiles %}
                     {
                         "file_path": "{{logfile.file_path}}",
-
-                    {% if logfile.log_group_name is defined -%}
+                        {% if logfile.log_group_name is defined -%}
                         "log_group_name": "{{logfile.log_group_name}}",
-                    {%- endif %}
-                    {% if logfile.log_stream_name is defined -%}
+                        {%- endif %}
+                        {% if logfile.log_stream_name is defined -%}
                         "log_stream_name": "{{logfile.log_stream_name}}",
-                    {%- endif %}
-                    {% if logfile.timestamp_format is defined -%}
+                        {%- endif %}
+                        {% if logfile.timestamp_format is defined -%}
                         "timestamp_format": "{{logfile.timestamp_format}}",
-                    {%- endif %}
-                    {% if logfile.multi_line_start_pattern is defined -%}
+                        {%- endif %}
+                        {% if logfile.multi_line_start_pattern is defined -%}
                         "multi_line_start_pattern": "{{logfile.multi_line_start_pattern}}",
-                    {%- endif %}
+                        {%- endif %}
                         "timezone": "{{logfile.timezone|default(aws_cwa_default_timezone)}}"
                     }{%if not loop.last %},{% endif %}
 
