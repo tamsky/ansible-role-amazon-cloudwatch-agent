@@ -2,20 +2,20 @@
 # fix facts
 # https://stackoverflow.com/questions/41564552/amazon-linux-machine-ansible-ansible-distribution-variables-major-release-dis
 - set_fact: ansible_distribution_major_version=6
-    when:
-      ( ansible_distribution == "Amazon" )
-      and
-      ( ansible_distribution_major_version == "NA" )
-      and
-      ( ansible_service_mgr == "upstart" )
+  when:
+    ( ansible_distribution == "Amazon" )
+    and
+    ( ansible_distribution_major_version == "NA" )
+    and
+    ( ansible_service_mgr == "upstart" )
 
 - set_fact: ansible_distribution_major_version=7 # untested
-    when:
-      ( ansible_distribution == "Amazon" )
-      and
-      ( ansible_distribution_major_version == "NA" )
-      and
-      ( ansible_service_mgr == "systemd" )
+  when:
+    ( ansible_distribution == "Amazon" )
+    and
+    ( ansible_distribution_major_version == "NA" )
+    and
+    ( ansible_service_mgr == "systemd" )
 
 # START OF ROLE
 - name: Must be Ubuntu (12, 14, or 16) or Amazon Linux and 64-bit
