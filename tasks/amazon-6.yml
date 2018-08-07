@@ -27,13 +27,13 @@
   when: ( probably_already_installed.stat.exists != True )
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Copy amazon-cloudwatch-agent.json
+- name: "Copy {{aws_cwa_agent_config_json}}"
   template:
     src: "{{ item }}"
-    dest: "/opt/aws/amazon-cloudwatch-agent/etc/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    dest: "{{ aws_cwa_agent_root_path }}/etc/{{ item | basename | regex_replace('\\.j2$', '') }}"
     mode: 0644
   with_fileglob:
-  - "{{aws_cwa_cfgs_dir}}/amazon-cloudwatch-agent.json.j2"
+  - "{{aws_cwa_cfgs_dir}}/{{aws_cwa_agent_config_json}}.j2"
   notify: restart amazon-cloudwatch-agent
 
 # globeandmail's version of this role would install a patched version of the 

@@ -1,5 +1,7 @@
 ---
 aws_cwa_region: 'us-east-1'
+aws_cwa_agent_config_json: amazon-cloudwatch-agent.json
+aws_cwa_agent_root_path: /opt/aws/amazon-cloudwatch-agent
 aws_cwa_agent_logfile_path: /var/log/amazon-cloudwatch-agent.log
 aws_cwa_disk_monitor_paths:
   - "/"
