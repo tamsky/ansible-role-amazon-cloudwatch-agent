@@ -1,0 +1,64 @@
+{# This file will be templated by Ansible #}
+{
+    "agent": {
+        "metrics_collection_interval": 60,
+        "region": "{{aws_cwa_region}}",
+        "logfile": "{{aws_cwa_agent_logfile_path}}",
+        "debug": false
+    },
+{% if aws_cwa_logfiles|length > 0 %}
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+{% for logfile in aws_cwa_logfiles %}
+                    {
+                        "file_path": "{{logfile.file_path}}",
+
+                    {%- if 'log_group_name' in logfile -%}
+                        "log_group_name": "{{logfile.log_group_name}}",
+                    {%- endif -%}
+                    {%- if 'log_stream_name' in logfile -%}
+                        "log_stream_name": "{{logfile.log_stream_name}}",
+                    {%- endif -%}
+                    {%- if 'timestamp_format' in logfile -%}
+                        "timestamp_format": "{{logfile.timestamp_format}}",
+                    {%- endif -%}
+                    {%- if 'multi_line_start_pattern' in logfile -%}
+                        "multi_line_start_pattern": "{{logfile.multi_line_start_pattern}}",
+                    {%- endif -%}
+                        "timezone": "{{logfile.timezone|default(aws_cwa_default_timezone)}}"
+                    }{%if not loop.last %},{% endif %}
+
+{% endfor %}
+                ]
+            }
+        }
+    },
+{% endif %}
+    "metrics": {
+        "namespace": "{{aws_cwa_namespace}}",
+        "metrics_collected": {
+            "cpu": {
+                "measurement": [
+                    "cpu_usage_idle"
+                ],
+                "metrics_collection_interval": 60,
+                "totalcpu": true
+            },
+            "disk": {
+                "measurement": [
+                    "used_percent"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [{% for p in aws_cwa_disk_monitor_paths %}"{{p}}"{% if not loop.last %}, {%endif%}{%endfor%}]
+            },
+            "mem": {
+                "measurement": [
+                    "mem_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    }
+}

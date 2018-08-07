@@ -1,0 +1,61 @@
+---
+
+- name: Already installed?
+  stat:
+    path: /opt/aws/amazon-cloudwatch-agent
+  register: probably_already_installed
+
+- block:
+  when: probably_already_installed.stat.exists != True
+  ignore_errors: "{{ ansible_check_mode }}"
+  - name: make temp dir for installation files
+    file:
+      path: /tmp/aws-cwa-inst
+      state: directory
+  - name: download & unpack the latest cloudwatch agent .zip
+    unarchive:
+      remote_src: yes
+      src: "https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip"
+      dest: /tmp/aws-cwa-inst/
+  - name: install the RPM
+    yum:
+      name: /tmp/aws-cwa-inst/amazon-cloudwatch-agent.rpm
+      state: present
+    notify: restart amazon-cloudwatch-agent
+  - name: remove temp dir
+    file:
+      path: /tmp/aws-cwa-inst/
+      state: absent
+
+- name: Copy configs amazon-cloudwatch-agent.(json|toml)
+  template:
+    src: "{{ item }}"
+    dest: "/opt/aws/amazon-cloudwatch-agent/etc/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: 0644
+  with_fileglob:
+  - "{{aws_cwa_cfgs_dir}}/*.j2"
+  notify: restart amazon-cloudwatch-agent
+
+# globeandmail's version of this role would install a patched version of the 
+#   /opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent script
+# given there's no published TOML schema yet, we believe that continuing to use the JSON
+# spec is the only supportable option, so we leave the start script alone here.
+
+- name: enable service on boot
+  service:
+    name: amazon-cloudwatch-agent
+    enabled: yes
+
+- name: Add log rotation for amazon-cloudwatch-agent.log
+  copy:
+    dest: '/etc/logrotate.d/aws-cloudwatch-agent'
+    owner: 'root'
+    group: 'root'
+    content: |
+        {{ aws_cwa_agent_logfile_path }} {
+            size 50M
+            rotate 5
+            compress
+            missingok
+            copytruncate
+        }
