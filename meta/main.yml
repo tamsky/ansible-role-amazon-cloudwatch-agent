@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  author: 1adam
+  description: Install and configure "unified" Amazon CloudWatch Agent
+  company: globeandmail
+  license: "unknown (based on licenses associated with globeandmail/ansible-role-* repos, possibly MIT)"
+  min_ansible_version: 2.4
+  platforms:
+  - name: EL
+    versions:
+    - 6
+  - name: Amazon
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - trusty
+    - xenial
+
+  categories:
+  - cloud
+  - cloud:ec2
+  - monitoring
+dependencies: []
