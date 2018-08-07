@@ -27,7 +27,10 @@
   when: ( probably_already_installed.stat.exists != True )
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Copy configs amazon-cloudwatch-agent.(json|toml)
+- debug:
+    var: aws_cwa_logfiles
+
+- name: Copy amazon-cloudwatch-agent.json
   template:
     src: "{{ item }}"
     dest: "/opt/aws/amazon-cloudwatch-agent/etc/{{ item | basename | regex_replace('\\.j2$', '') }}"
