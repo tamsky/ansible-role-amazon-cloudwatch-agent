@@ -4,3 +4,6 @@
     name: "amazon-cloudwatch-agent"
     state: "restarted"
     sleep: 15
+  when:
+    aws_cwa_handler_disable_restart is not defined
+    
