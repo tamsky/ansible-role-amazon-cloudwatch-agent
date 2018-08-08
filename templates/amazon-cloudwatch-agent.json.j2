@@ -37,6 +37,12 @@
 {% endif %}
     "metrics": {
         "namespace": "{{aws_cwa_namespace}}",
+        {% if aws_cwa_metrics_append_dimensions is defined -%}
+        "append_dimensions": {{ aws_cwa_metrics_append_dimensions | to_json }},
+        {% endif %}
+        {% if aws_cwa_metrics_aggregation_dimensions is defined -%}
+        "aggregation_dimensions": {{ aws_cwa_metrics_aggregation_dimensions | to_json }},
+        {% endif %}
         "metrics_collected": {
             "cpu": {
                 "measurement": [
