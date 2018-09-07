@@ -42,9 +42,12 @@
 {% endif %}
 {% if aws_cwa_metrics_aggregation_dimensions is defined %}
         "aggregation_dimensions": {{ aws_cwa_metrics_aggregation_dimensions | to_nice_json(indent=4) | indent(8) }},
-{%- endif %}
+{% endif %}
         "metrics_collected": {
             "cpu": {
+{% if aws_cwa_metrics_collected_append_dimensions is defined %}
+                "append_dimensions": {{ aws_cwa_metrics_collected_append_dimensions | to_nice_json(indent=4) | indent(12) }},
+{% endif %}
                 "measurement": [
                     "cpu_usage_idle"
                 ],
@@ -52,6 +55,9 @@
                 "totalcpu": true
             },
             "disk": {
+{% if aws_cwa_metrics_collected_append_dimensions is defined %}
+                "append_dimensions": {{ aws_cwa_metrics_collected_append_dimensions | to_nice_json(indent=4) | indent(12) }},
+{% endif %}
                 "measurement": [
                     "used_percent"
                 ],
@@ -59,6 +65,9 @@
                 "resources": [{% for p in aws_cwa_disk_monitor_paths %}"{{p}}"{% if not loop.last %}, {%endif%}{%endfor%}]
             },
             "mem": {
+{% if aws_cwa_metrics_collected_append_dimensions is defined %}
+                "append_dimensions": {{ aws_cwa_metrics_collected_append_dimensions | to_nice_json(indent=4) | indent(12) }},
+{% endif %}
                 "measurement": [
                     "mem_used_percent"
                 ],
