@@ -6,24 +6,31 @@
   register: probably_already_installed
 
 - block:
+
   - name: make temp dir for installation files
     file:
       path: /tmp/aws-cwa-inst
       state: directory
+
   - name: download & unpack the latest cloudwatch agent .zip
     unarchive:
       remote_src: yes
       src: "https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip"
       dest: /tmp/aws-cwa-inst/
+
+  # Using documentation from AWS for installation:
+  # * https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-first-instance.html#download-CloudWatch-Agent-on-EC2-Instance-first
   - name: install the RPM
-    yum:
-      name: /tmp/aws-cwa-inst/amazon-cloudwatch-agent.rpm
-      state: present
+    command: rpm -U amazon-cloudwatch-agent.rpm
+    args:
+      chdir: /tmp/aws-cwa-inst/
     notify: restart amazon-cloudwatch-agent
+
   - name: remove temp dir
     file:
       path: /tmp/aws-cwa-inst/
       state: absent
+
   when: ( probably_already_installed.stat.exists != True )
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -36,7 +43,7 @@
   - "{{aws_cwa_cfgs_dir}}/{{aws_cwa_agent_config_json}}.j2"
   notify: restart amazon-cloudwatch-agent
 
-# globeandmail's version of this role would install a patched version of the 
+# globeandmail's version of this role would install a patched version of the
 #   /opt/aws/amazon-cloudwatch-agent/bin/start-amazon-cloudwatch-agent script
 # given there's no published TOML schema yet, we believe that continuing to use the JSON
 # spec is the only supportable option, so we leave the start script alone here.
