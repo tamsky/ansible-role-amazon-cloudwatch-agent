@@ -1,0 +1,78 @@
+{# This file will be templated by Ansible #}
+{
+    "agent": {
+        "metrics_collection_interval": 60,
+        "region": "{{aws_cwa_region}}",
+        "logfile": "{{aws_cwa_agent_logfile_path}}",
+        "debug": false
+    },
+{% if aws_cwa_logfiles|length > 0 %}
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+{% for logfile in aws_cwa_logfiles %}
+                    {
+                        "file_path": "{{logfile.file_path}}",
+{% if logfile.log_group_name is defined %}
+                        "log_group_name": "{{logfile.log_group_name}}",
+{% endif %}
+{% if logfile.log_stream_name is defined %}
+                        "log_stream_name": "{{logfile.log_stream_name}}",
+{% endif %}
+{% if logfile.timestamp_format is defined %}
+                        "timestamp_format": "{{logfile.timestamp_format}}",
+{% endif %}
+{% if logfile.multi_line_start_pattern is defined %}
+                        "multi_line_start_pattern": "{{logfile.multi_line_start_pattern}}",
+{% endif %}
+                        "timezone": "{{logfile.timezone|default(aws_cwa_default_timezone)}}"
+                    }{%if not loop.last %},{% endif %}
+
+{% endfor %}
+                ]
+            }
+        }
+    },
+{% endif %}
+    "metrics": {
+        "namespace": "{{aws_cwa_namespace}}",
+{% if aws_cwa_metrics_append_dimensions is defined %}
+        "append_dimensions": {{ aws_cwa_metrics_append_dimensions | to_nice_json(indent=4) | indent(8) }},
+{% endif %}
+{% if aws_cwa_metrics_aggregation_dimensions is defined %}
+        "aggregation_dimensions": {{ aws_cwa_metrics_aggregation_dimensions | to_nice_json(indent=4) | indent(8) }},
+{% endif %}
+        "metrics_collected": {
+            "cpu": {
+{% if aws_cwa_metrics_collected_append_dimensions is defined %}
+                "append_dimensions": {{ aws_cwa_metrics_collected_append_dimensions | to_nice_json(indent=4) | indent(12) }},
+{% endif %}
+                "measurement": [
+                    "cpu_usage_idle"
+                ],
+                "metrics_collection_interval": 60,
+                "totalcpu": true
+            },
+            "disk": {
+{% if aws_cwa_metrics_collected_append_dimensions is defined %}
+                "append_dimensions": {{ aws_cwa_metrics_collected_append_dimensions | to_nice_json(indent=4) | indent(12) }},
+{% endif %}
+                "measurement": [
+                    "used_percent"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [{% for p in aws_cwa_disk_monitor_paths %}"{{p}}"{% if not loop.last %}, {%endif%}{%endfor%}]
+            },
+            "mem": {
+{% if aws_cwa_metrics_collected_append_dimensions is defined %}
+                "append_dimensions": {{ aws_cwa_metrics_collected_append_dimensions | to_nice_json(indent=4) | indent(12) }},
+{% endif %}
+                "measurement": [
+                    "mem_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    }
+}

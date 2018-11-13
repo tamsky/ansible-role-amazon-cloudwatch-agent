@@ -1,7 +1,39 @@
 ---
-- name: Must be Ubuntu (12, 14, or 16) and 64-bit
+# fix facts
+# https://stackoverflow.com/questions/41564552/amazon-linux-machine-ansible-ansible-distribution-variables-major-release-dis
+- set_fact: ansible_distribution_major_version=6
+  when:
+    ( ansible_distribution == "Amazon" )
+    and
+    ( ansible_distribution_major_version == "NA" )
+    and
+    ( ansible_service_mgr == "upstart" )
+
+- set_fact: ansible_distribution_major_version=7 # untested
+  when:
+    ( ansible_distribution == "Amazon" )
+    and
+    ( ansible_distribution_major_version == "NA" )
+    and
+    ( ansible_service_mgr == "systemd" )
+
+# START OF ROLE
+- name: Must be Ubuntu (12, 14, or 16) or Amazon Linux and 64-bit
   fail:
-    msg: "This role is intended for use only with Ubuntu 12, 64-bit"
-  when: (ansible_architecture != 'x86_64') or ((ansible_distribution|lower != 'ubuntu') or (ansible_distribution_major_version not in ['12','14','16']))
+    msg: "This role is intended for use only with 64-bit: Ubuntu(12,14,16), or Amazon Linux"
+  when:
+    (ansible_architecture != 'x86_64')
+      or
+    (
+      (ansible_distribution|lower == 'ubuntu')
+        and
+      (ansible_distribution_major_version not in ['12','14','16'])
+    )
+      or
+    (
+      (ansible_distribution|lower == 'amazon')
+        and
+      (ansible_distribution_major_version not in ['6'])
+    )
 
 - include_tasks: "{{ansible_distribution|lower}}-{{ansible_distribution_major_version}}.yml"
